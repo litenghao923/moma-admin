@@ -1,6 +1,7 @@
 package com.moma.momaadmin.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysUser;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,5 +14,7 @@ public interface SysUserService extends IService<SysUser> {
 
     SysUser getUserByName(String username);
 
-    boolean userRegister(SysUser user);
+    boolean checkUserNameUnique(String username);
+
+    boolean userRegister(RegisterBody registerBody);
 }

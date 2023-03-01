@@ -2,11 +2,17 @@ package com.moma.momaadmin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysUser;
 import com.moma.momaadmin.service.SysUserService;
 import com.moma.momaadmin.mapper.SysUserMapper;
+import com.moma.momaadmin.util.DateUtil;
+import com.moma.momaadmin.util.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * @author litenghao
@@ -21,18 +27,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return getOne(new QueryWrapper<SysUser>().eq("username", username));
     }
 
+    @Override
+    public boolean checkUserNameUnique(String username) {
+        QueryWrapper<SysUser> wrapper=new QueryWrapper<SysUser>();
+        wrapper.eq("username",username);
+        long count =count(wrapper);
+        return count <= 0;
+    }
+
+
     @Transactional
     @Override
-    public boolean userRegister(SysUser user) {
-        if (user.getUsername() != null && baseMapper.selectCount(new QueryWrapper<SysUser>().eq("username", user.getUsername())) > 0) {
-            return false;
-        } else {
-            boolean result = baseMapper.insert(user) > 0;
-            if (result){
-                //添加默认角色;
-            }
-            return result;
-        }
+    public boolean userRegister(RegisterBody registerBody) {
+        SysUser regUser=new SysUser();
+        regUser.setUsername(registerBody.getUsername());
+        regUser.setPassword(StringUtil.encodePassword(registerBody.getPassword()));
+        regUser.setNickname("默认昵称"+StringUtil.getRandomString(4));
+        regUser.setPhone(registerBody.getPhone());
+        regUser.setEmail(registerBody.getEmail());
+        regUser.setCreateTime(new Date());
+        regUser.setStatus("0");
+        return save(regUser);
     }
 }
 
