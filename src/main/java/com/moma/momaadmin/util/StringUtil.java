@@ -1,5 +1,7 @@
 package com.moma.momaadmin.util;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -118,5 +120,10 @@ public class StringUtil {
             }
         }
         return sb.toString();
+    }
+
+    public static String encodePassword(String password){
+        if (password==null) return null;
+        return new BCryptPasswordEncoder().encode(password);
     }
 }

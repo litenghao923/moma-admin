@@ -10,6 +10,7 @@ public class WebPageController {
 
     @RequestMapping("code")
     public String goIndex(Model model){
+        model.addAttribute("title","hip0ker");
         model.addAttribute("username","litenghao");
         model.addAttribute("code","123456");
         return "code-mail";

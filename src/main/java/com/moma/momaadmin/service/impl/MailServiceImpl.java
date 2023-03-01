@@ -29,18 +29,15 @@ public class MailServiceImpl implements MailService {
     private Configuration configuration;
 
     @Override
-    public void sendCodeByMail(String to, String subject, String username, String code) throws MessagingException, IOException, TemplateException {
-
+    public void sendCodeByMail(String to, String subject, String nickname, String code) throws MessagingException, IOException, TemplateException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setFrom(from);
-        helper.setBcc(from);
         helper.setTo(to);
         helper.setSubject(subject);
         Map<String, Object> map = new HashMap<>();
         map.put("title", "Hip0ker邮件验证码");
-        map.put("username", username);
+        map.put("username", nickname);
         map.put("code", code);
         String process = FreeMarkerTemplateUtils.processTemplateIntoString(configuration.getTemplate("code-mail.ftl"), map);
         helper.setText(process, true);

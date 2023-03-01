@@ -10,13 +10,11 @@ import com.moma.momaadmin.util.StringUtil;
 import com.moma.momaadmin.util.ValidateCodeUtil;
 import freemarker.template.TemplateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,8 +47,8 @@ public class TestController {
     }
 
     @RequestMapping("login")
-    public RestResult login() {
-        String token = JwtUtil.genJwtToken("litenghao");
+    public RestResult login(String username) {
+        String token = JwtUtil.genJwtToken(username);
         return RestResult.ok().put("token", token);
     }
 
@@ -60,14 +58,16 @@ public class TestController {
 
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.eq("username", username);
-        String email = sysUserService.getOne(wrapper).getEmail();
+        SysUser user = sysUserService.getOne(wrapper);
+        String email = user.getEmail();
+        String nickname = user.getNickname();
         if (StringUtil.isNotEmpty(email)) {
             //邮件标题
             String subject = "摩码网络登录验证码";
             //登录验证码
             String code = ValidateCodeUtil.generateStringValidateCode(6).toString();
             //邮件主体部分
-            mailService.sendCodeByMail(email, subject, username, code);
+            mailService.sendCodeByMail(email, subject, nickname, code);
             return RestResult.ok("验证码发送成功，请及时查看");
         } else {
             return RestResult.error("验证码发送失败，请重新获取！");

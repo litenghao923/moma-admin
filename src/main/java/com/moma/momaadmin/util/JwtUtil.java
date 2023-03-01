@@ -62,20 +62,20 @@ public class JwtUtil {
             checkResult.setSuccess(true);
             checkResult.setClaims(claims);
         } catch (ExpiredJwtException e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERRCODE_EXPIRE);
+            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_EXPIRE);
             checkResult.setSuccess(false);
         } catch (SignatureException e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERRCODE_FAIL);
+            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_FAIL);
             checkResult.setSuccess(false);
         } catch (Exception e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERRCODE_FAIL);
+            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_FAIL);
             checkResult.setSuccess(false);
         }
         return checkResult;
     }
 
     public static SecretKey generalKey() {
-        byte[] encodeKey = Base64.decode(JwtConstant.JWT_SECERT);
+        byte[] encodeKey = Base64.decode(JwtConstant.JWT_SECRET_KEY);
         SecretKey key = new SecretKeySpec(encodeKey, 0, encodeKey.length, "AES");
         return key;
     }

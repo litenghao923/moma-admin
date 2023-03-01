@@ -7,5 +7,5 @@ import java.io.IOException;
 
 public interface MailService {
 
-    public void sendCodeByMail(String to, String subject, String username, String code) throws MessagingException, IOException, TemplateException;
+    public void sendCodeByMail(String to, String subject, String nickname, String code) throws MessagingException, IOException, TemplateException;
 }
