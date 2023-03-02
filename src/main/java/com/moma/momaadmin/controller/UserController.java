@@ -5,6 +5,7 @@ import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysUser;
 import com.moma.momaadmin.service.SysUserService;
 import com.moma.momaadmin.util.RestResult;
+import com.moma.momaadmin.util.SecurityUtil;
 import com.moma.momaadmin.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -51,13 +52,19 @@ public class UserController {
     @PostMapping("login")
     public RestResult userLogin(@RequestBody SysUser user) {
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
-        wrapper.eq("username",user.getUsername()).eq("password",user.getPassword());
-        long count = userService.count(wrapper);
-        if (count>0){
-            return RestResult.ok("登录成功");
+        wrapper.eq("username",user.getUsername());
+        SysUser loginUser = userService.getOne(wrapper);
+        if (loginUser!=null){
+            boolean isRight= SecurityUtil.matchesPassword(user.getPassword(),loginUser.getPassword());
+            if (isRight){
+                return RestResult.ok("登录成功");
+            }else {
+                return RestResult.error("用户名或密码不正确");
+            }
         }else {
-            return RestResult.error("用户名或密码不正确");
+            return RestResult.error("该用户不存在");
         }
+
     }
 
     @GetMapping("checkRegistered")

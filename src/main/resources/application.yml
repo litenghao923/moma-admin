@@ -2,6 +2,9 @@ server:
   port: 8080
   servlet:
     context-path: /
+logging:
+  pattern:
+    console: '%d{HH:mm:ss.SSS} %clr(%-5level) --- [%-15thread] %cyan(%-50logger{50}):%msg%n'
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/moma?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC

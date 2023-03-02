@@ -7,6 +7,7 @@ import com.moma.momaadmin.entity.SysUser;
 import com.moma.momaadmin.service.SysUserService;
 import com.moma.momaadmin.mapper.SysUserMapper;
 import com.moma.momaadmin.util.DateUtil;
+import com.moma.momaadmin.util.SecurityUtil;
 import com.moma.momaadmin.util.StringUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +42,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public boolean userRegister(RegisterBody registerBody) {
         SysUser regUser=new SysUser();
         regUser.setUsername(registerBody.getUsername());
-        regUser.setPassword(StringUtil.encodePassword(registerBody.getPassword()));
+        regUser.setPassword(SecurityUtil.encryptPassword(registerBody.getPassword()));
         regUser.setNickname("默认昵称"+StringUtil.getRandomString(4));
         regUser.setPhone(registerBody.getPhone());
         regUser.setEmail(registerBody.getEmail());
-        regUser.setCreateTime(new Date());
-        regUser.setStatus("0");
         return save(regUser);
     }
 }
