@@ -3,6 +3,7 @@ package com.moma.momaadmin.common.security;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.moma.momaadmin.entity.SysUser;
 import com.moma.momaadmin.service.SysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,23 +17,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class LoginImpl implements UserDetailsService {
+@Slf4j
+public class MyUserDetailsService implements UserDetailsService {
 
     @Resource
     private SysUserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SysUser user = userService.getUserByName(username);
-        if (user==null){
+        QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
+        wrapper.eq("username", username);
+        SysUser user = userService.getOne(wrapper);
+        if (user == null) {
             throw new UsernameNotFoundException("用户名或密码错误");
-        }else if ("0".equals(user.getStatus())){
+        } else if ("0".equals(user.getStatus())) {
             throw new LockedException("账号已冻结");
         }
-        return new User(user.getUsername(),user.getPassword(),getUserAuthority());
+        return new User(user.getUsername(), user.getPassword(), getUserAuthority());
     }
 
-    private List<GrantedAuthority> getUserAuthority(){
+    private List<GrantedAuthority> getUserAuthority() {
         return new ArrayList<>();
     }
 }

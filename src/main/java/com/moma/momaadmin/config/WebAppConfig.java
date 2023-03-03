@@ -17,4 +17,6 @@ public class WebAppConfig implements WebMvcConfigurer {
                 .allowedMethods(new String[]{"GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS"})
                 .maxAge(3600);
     }
+
+
 }

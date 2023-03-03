@@ -1,111 +1,85 @@
 package com.moma.momaadmin.util;
 
-import com.moma.momaadmin.common.JwtConstant;
 import io.jsonwebtoken.*;
-import org.bouncycastle.util.encoders.Base64;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 public class JwtUtil {
 
-    /**
-     * 签发JWT
-     *
-     * @param id
-     * @param subject   可以是JSON数据 即可能少
-     * @param ttlMillis
-     * @return
-     */
-    public static String createJWT(String id, String subject, long ttlMillis) {
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        long nowMillis = System.currentTimeMillis();
-        Date now = new Date(nowMillis);
-        SecretKey secretKey = generalKey();
-        JwtBuilder builder = Jwts.builder()
-                .setId(id)
-                .setSubject(subject)  //主题
-                .setIssuer("litenghao")  //签发者
-                .setIssuedAt(now)    //签发时间
-                .signWith(signatureAlgorithm, secretKey); //签名算法以及密钥
-        if (ttlMillis >= 0) {
-            long expMillis = nowMillis + ttlMillis;
-            Date expDate = new Date(expMillis);
-            //过期时间
-            builder.setExpiration(expDate);
-        }
-        return builder.compact();
+    public static final String FRONT_SECRET = "ukc8BDbRigUDaY6pZFfWus2jZWLPHO";
+
+    public static String getJwtToken(String name){
+
+        String JwtToken = Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS256")
+                .setSubject("moma-member")
+                .setIssuedAt(new Date())
+                .claim("name", name)
+                .signWith(SignatureAlgorithm.HS256, FRONT_SECRET)
+                .compact();
+
+        return JwtToken;
     }
 
     /**
-     * 生成jwt token
-     *
-     * @param username
+     * 判断token是否存在与有效
+     * @param jwtToken
      * @return
      */
-    public static String genJwtToken(String username) {
-        return createJWT(username, username, 60 * 60 * 1000);
-    }
-
-    /**
-     * 验证JWT
-     *
-     * @param jwtStr
-     * @return
-     */
-    public static CheckResult validateJWT(String jwtStr) {
-        CheckResult checkResult = new CheckResult();
-        Claims claims = null;
+    public static boolean checkToken(String jwtToken) {
+        if(StringUtil.isEmpty(jwtToken)) return false;
         try {
-            claims = parseJWT(jwtStr);
-            checkResult.setSuccess(true);
-            checkResult.setClaims(claims);
-        } catch (ExpiredJwtException e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_EXPIRE);
-            checkResult.setSuccess(false);
-        } catch (SignatureException e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_FAIL);
-            checkResult.setSuccess(false);
+            Jwts.parser().setSigningKey(FRONT_SECRET).parseClaimsJws(jwtToken);
         } catch (Exception e) {
-            checkResult.setErrCode(JwtConstant.JWT_ERR_CODE_FAIL);
-            checkResult.setSuccess(false);
+            e.printStackTrace();
+            return false;
         }
-        return checkResult;
-    }
-
-    public static SecretKey generalKey() {
-        byte[] encodeKey = Base64.decode(JwtConstant.JWT_SECRET_KEY);
-        SecretKey key = new SecretKeySpec(encodeKey, 0, encodeKey.length, "AES");
-        return key;
+        return true;
     }
 
     /**
-     * 解析JWT字符串
-     *
-     * @param jwt
+     * 判断token是否存在与有效
+     * @param request
      * @return
      */
-    public static Claims parseJWT(String jwt) {
-        SecretKey secretKey = generalKey();
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(jwt)
-                .getBody();
+    public static boolean checkToken(HttpServletRequest request) {
+        try {
+            String jwtToken = request.getHeader("token");
+            if(StringUtil.isEmpty(jwtToken)) return false;
+            Jwts.parser().setSigningKey(FRONT_SECRET).parseClaimsJws(jwtToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        //设置20秒失效
-        String sc = createJWT("1", "李腾昊", 1000);
-        System.out.println(sc);
-        System.out.println(validateJWT(sc).getErrCode());
-        System.out.println(validateJWT(sc).getClaims().getId());
-        System.out.println(validateJWT(sc).getClaims().getSubject());
-//        Thread.sleep(3000);
-        System.out.println(validateJWT(sc).getClaims());
-        Claims claims = validateJWT(sc).getClaims();
-        String sc2 = createJWT(claims.getId(), claims.getSubject(), JwtConstant.JWT_TTL);
-        System.out.println(sc2);
+    /**
+     * 根据token获取会员id
+     * @param request
+     * @return
+     */
+    public static String getMemberIdByJwtToken(HttpServletRequest request) {
+        String jwtToken = request.getHeader("token");
+        if(StringUtil.isEmpty(jwtToken)) return null;
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(FRONT_SECRET).parseClaimsJws(jwtToken);
+        Claims claims = claimsJws.getBody();
+        return claims.get("id").toString();
+    }
+
+    /**
+     * 根据token获取用户名
+     * @param request
+     * @return
+     */
+    public static String getUsernameByJwtToken(HttpServletRequest request) {
+        String jwtToken = request.getHeader("token");
+        if(StringUtil.isEmpty(jwtToken)) return null;
+        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(FRONT_SECRET).parseClaimsJws(jwtToken);
+        Claims claims = claimsJws.getBody();
+        return String.valueOf(claims.get("name").toString());
     }
 
 }

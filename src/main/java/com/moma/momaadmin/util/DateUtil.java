@@ -46,13 +46,13 @@ public class DateUtil {
 
     public static String getCurrentDatePath()throws Exception{
         Date date=new Date();
-        SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd/");
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(date);
     }
 
     public static void main(String[] args) {
         try {
-            System.out.println(getCurrentDateStr());
+            System.out.println(getCurrentDatePath());
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
