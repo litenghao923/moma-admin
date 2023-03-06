@@ -30,10 +30,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private LoginFailureHandler loginFailureHandler;
 
     @Resource
-    private MyUserDetailsService myUserDetailsService;
+    private JwtLogoutSuccessHandler logoutSuccessHandler;
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
+
+    @Resource
+    private JwtAccessDeniedHandler accessDeniedHandler;
+
+    @Resource
+    private MyUserDetailsService myUserDetailsService;
 
 
     private static final String URL_WHITELIST[] = {
@@ -47,6 +53,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception{
+        JwtAuthenticationFilter jwtAuthenticationFilter=new JwtAuthenticationFilter(authenticationManager());
+        return jwtAuthenticationFilter;
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
@@ -57,16 +69,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .cors().and().csrf().disable()//开启跨域 csrf攻击关闭
                 //登录登出配置
-                .formLogin().usernameParameter("username").passwordParameter("password")
-                .successHandler(loginSuccessHandler).failureHandler(loginFailureHandler)
+                .formLogin().successHandler(loginSuccessHandler).failureHandler(loginFailureHandler)
                 .and()
-                .logout()
+                .logout().logoutSuccessHandler(logoutSuccessHandler)
                 .and()
                 //session禁用配置
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests().antMatchers(URL_WHITELIST).permitAll().anyRequest().authenticated()
                 .and()
-                .exceptionHandling().authenticationEntryPoint(new UnauthorizedEntryPoint());
+                .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler)
+                .and()
+                .addFilter(jwtAuthenticationFilter());
     }
 }

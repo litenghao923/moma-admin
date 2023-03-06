@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 /**
 * @author litenghao
-* @description 针对表【sys_role(角色信息表)】的数据库操作Service实现
-* @createDate 2023-03-02 17:14:04
+* @description 针对表【sys_role】的数据库操作Service实现
+* @createDate 2023-03-06 17:40:33
 */
 @Service
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole>

@@ -15,15 +15,21 @@ import lombok.Data;
 @Data
 public class SysUserRole implements Serializable {
     /**
+     * id 自增
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+
+    /**
      * 用户ID
      */
-    @TableId(value = "user_id")
+    @TableField(value = "user_id")
     private Long userId;
 
     /**
      * 角色ID
      */
-    @TableId(value = "role_id")
+    @TableField(value = "role_id")
     private Long roleId;
 
     @TableField(exist = false)

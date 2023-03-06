@@ -5,11 +5,12 @@
 <mapper namespace="com.moma.momaadmin.mapper.SysRoleMenuMapper">
 
     <resultMap id="BaseResultMap" type="com.moma.momaadmin.entity.SysRoleMenu">
-            <id property="roleId" column="role_id" jdbcType="BIGINT"/>
-            <id property="menuId" column="menu_id" jdbcType="BIGINT"/>
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="roleId" column="role_id" jdbcType="BIGINT"/>
+            <result property="menuId" column="menu_id" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        role_id,menu_id
+        id,role_id,menu_id
     </sql>
 </mapper>

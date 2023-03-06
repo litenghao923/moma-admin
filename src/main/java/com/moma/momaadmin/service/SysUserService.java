@@ -17,4 +17,6 @@ public interface SysUserService extends IService<SysUser> {
     boolean checkUserNameUnique(String username);
 
     boolean userRegister(RegisterBody registerBody);
+
+    String getUserAuthorityInfo(Long userId);
 }

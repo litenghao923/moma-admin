@@ -6,6 +6,7 @@ import com.moma.momaadmin.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,10 +33,18 @@ public class MyUserDetailsService implements UserDetailsService {
         } else if ("0".equals(user.getStatus())) {
             throw new LockedException("账号已冻结");
         }
-        return new User(user.getUsername(), user.getPassword(), getUserAuthority());
+        return new User(user.getUsername(), user.getPassword(), getUserAuthority(user.getId()));
     }
 
-    private List<GrantedAuthority> getUserAuthority() {
-        return new ArrayList<>();
+    /**
+     * 获取用户权限信息 包括角色 菜单权限信息
+     * @param userId
+     * @return
+     */
+    public List<GrantedAuthority> getUserAuthority(Long userId) {
+        System.out.println("获取用户权限信息 包括菜单 菜单权限信息");
+        String authority=userService.getUserAuthorityInfo(userId);
+        System.out.println("auth="+authority);
+        return AuthorityUtils.commaSeparatedStringToAuthorityList(authority);
     }
 }
