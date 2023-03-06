@@ -3,7 +3,9 @@ package com.moma.momaadmin.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysUser;
+import com.moma.momaadmin.entity.SysUserRole;
 import com.moma.momaadmin.service.MailService;
+import com.moma.momaadmin.service.SysUserRoleService;
 import com.moma.momaadmin.service.SysUserService;
 import com.moma.momaadmin.util.RestResult;
 import com.moma.momaadmin.util.StringUtil;
@@ -22,6 +24,9 @@ public class RegisterController {
 
     @Autowired
     private SysUserService userService;
+
+    @Autowired
+    private SysUserRoleService userRoleService;
 
     @Autowired
     private MailService mailService;
@@ -51,6 +56,10 @@ public class RegisterController {
         }else {
             isSuccess=userService.userRegister(registerBody);
             if (isSuccess){
+                SysUserRole userRole=new SysUserRole();
+                userRole.setUserId(1L);
+                userRole.setRoleId(2L);
+                userRoleService.save(userRole);
                 return RestResult.ok("注册成功");
             }else {
                 return RestResult.error("注册失败");

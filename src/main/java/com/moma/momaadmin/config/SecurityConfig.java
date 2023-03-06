@@ -37,7 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     private static final String URL_WHITELIST[] = {
-            "/captcha"
+            "/register",
+            "/checkRegistered",
+            "/sendCode"
     };
 
     @Bean

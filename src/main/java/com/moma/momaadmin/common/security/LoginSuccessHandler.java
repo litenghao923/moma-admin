@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.moma.momaadmin.entity.SysRole;
 import com.moma.momaadmin.entity.SysUser;
 import com.moma.momaadmin.service.SysUserService;
+import com.moma.momaadmin.util.DateUtil;
 import com.moma.momaadmin.util.JwtUtil;
 import com.moma.momaadmin.util.RestResult;
 import org.springframework.security.core.Authentication;
@@ -42,6 +43,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         QueryWrapper<SysUser> wrapper=new QueryWrapper<>();
         wrapper.eq("username",username);
         SysUser user=new SysUser();
+        user.setLoginDate(new Date());
         user.setUpdateTime(new Date());
         userService.update(user,wrapper);
         String token = JwtUtil.getJwtToken(username);

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysUser;
+import com.moma.momaadmin.service.SysUserRoleService;
 import com.moma.momaadmin.service.SysUserService;
 import com.moma.momaadmin.mapper.SysUserMapper;
 import com.moma.momaadmin.util.DateUtil;
@@ -46,6 +47,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         regUser.setNickname("默认昵称"+StringUtil.getRandomString(4));
         regUser.setPhone(registerBody.getPhone());
         regUser.setEmail(registerBody.getEmail());
+        regUser.setCreateTime(new Date());
+        regUser.setStatus("1");
+
         return save(regUser);
     }
 }
