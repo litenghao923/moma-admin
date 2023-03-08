@@ -2,6 +2,7 @@ package com.moma.momaadmin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.moma.momaadmin.common.security.JwtConstant;
 import com.moma.momaadmin.entity.RegisterBody;
 import com.moma.momaadmin.entity.SysMenu;
 import com.moma.momaadmin.entity.SysRole;
@@ -67,19 +68,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         regUser.setEmail(registerBody.getEmail());
         regUser.setCreateTime(new Date());
         regUser.setStatus("1");
-
         return save(regUser);
     }
 
     @Override
     public String getUserAuthorityInfo(Long userId) {
         StringBuffer authority = new StringBuffer();
-        String auth_key = "moma";
+        String auth_key = "moma_admin_";
         if (redisUtil.hasKey(auth_key + userId)) {
-            System.out.println("有缓存");
-            authority.append(redisUtil.get("moma",String.valueOf(userId)));
+            System.out.println("Redis有缓存");
+            authority.append(redisUtil.get("moma_admin_",String.valueOf(userId)));
         }else {
-            System.out.println("没缓存");
+            System.out.println("Redis没缓存");
             List<SysRole> roleList=sysRoleMapper.selectList(new QueryWrapper<SysRole>().inSql("id","SELECT role_id FROM sys_user_role WHERE user_id="+userId));
             if (roleList.size()>0){
                 String roleCodeStr=roleList.stream().map(r->"ROLE_"+r.getCode()).collect(Collectors.joining(","));
@@ -87,7 +87,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
 
             //获取菜单权限
-            Set<String> menuCodeSet=new HashSet<String>();
+            Set<String> menuCodeSet=new HashSet<>();
             for (SysRole sysRole:roleList){
                 List<SysMenu> menuList=sysMenuMapper.selectList(new QueryWrapper<SysMenu>().inSql("id","SELECT menu_id FROM sys_role_menu WHERE role_id="+sysRole.getId()));
                 for (SysMenu sysMenu:menuList){
@@ -102,8 +102,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                 String menuCodeStr=menuCodeSet.stream().collect(Collectors.joining(","));
                 authority.append(menuCodeStr);
             }
-            redisUtil.set(auth_key,String.valueOf(userId),authority,10*60);
-            System.out.println("authority:"+authority.toString());
+            redisUtil.set(auth_key,String.valueOf(userId),authority, JwtConstant.JWT_TTL);
         }
         return authority.toString();
     }

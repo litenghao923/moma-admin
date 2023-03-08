@@ -42,9 +42,7 @@ public class MyUserDetailsService implements UserDetailsService {
      * @return
      */
     public List<GrantedAuthority> getUserAuthority(Long userId) {
-        System.out.println("获取用户权限信息 包括菜单 菜单权限信息");
         String authority=userService.getUserAuthorityInfo(userId);
-        System.out.println("auth="+authority);
         return AuthorityUtils.commaSeparatedStringToAuthorityList(authority);
     }
 }
